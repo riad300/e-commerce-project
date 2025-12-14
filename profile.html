@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Account</title>
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+
+  <section class="account-page">
+    <div class="container">
+      <div class="account-wrapper">
+
+        <div class="account-column">
+          <h2>My Account</h2>
+
+          <p><strong>Name:</strong> <span id="pName">—</span></p>
+          <p><strong>Email:</strong> <span id="pEmail">—</span></p>
+
+          <div style="margin-top:16px;">
+            <button class="btn btn-sm" id="logoutBtn">Logout</button>
+          </div>
+
+          <hr style="margin:20px 0;">
+
+          <!-- E-commerce profile menu (UI only এখন) -->
+          <ul class="menu-list">
+            <li><a href="#" id="tabOrders">My Orders</a></li>
+            <li><a href="#" id="tabAddress">Addresses</a></li>
+            <li><a href="#" id="tabWishlist">Wishlist</a></li>
+            <li><a href="#" id="tabAccount">Account Details</a></li>
+          </ul>
+        </div>
+
+        <div class="account-column">
+          <h2 id="panelTitle">Dashboard</h2>
+          <div id="panelBody">
+            <p>Welcome! এখান থেকে তুমি orders, address, wishlist manage করতে পারবে.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Firebase Auth -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+    // ✅ account.html এর মতো same config এখানে বসাবে
+    const firebaseConfig = {
+      apiKey: "PASTE_HERE",
+      authDomain: "PASTE_HERE",
+      projectId: "PASTE_HERE",
+      appId: "PASTE_HERE"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const pName = document.getElementById("pName");
+    const pEmail = document.getElementById("pEmail");
+
+    // ✅ Protect page: login না থাকলে account.html এ পাঠাবে
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "account.html";
+        return;
+      }
+      pName.textContent = user.displayName || "(No name)";
+      pEmail.textContent = user.email || "";
+    });
+
+    // ✅ Logout
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "account.html";
+    });
+
+    // Simple tab UI (optional)
+    const panelTitle = document.getElementById("panelTitle");
+    const panelBody = document.getElementById("panelBody");
+
+    document.getElementById("tabOrders").onclick = (e) => {
+      e.preventDefault();
+      panelTitle.textContent = "My Orders";
+      panelBody.innerHTML = "<p>এখানে customer এর order list দেখাবে (Firestore থেকে আনবে)।</p>";
+    };
+    document.getElementById("tabAddress").onclick = (e) => {
+      e.preventDefault();
+      panelTitle.textContent = "Addresses";
+      panelBody.innerHTML = "<p>এখানে shipping/billing address দেখাবে ও edit করা যাবে (Firestore)।</p>";
+    };
+    document.getElementById("tabWishlist").onclick = (e) => {
+      e.preventDefault();
+      panelTitle.textContent = "Wishlist";
+      panelBody.innerHTML = "<p>এখানে wishlist items দেখাবে (Firestore)।</p>";
+    };
+    document.getElementById("tabAccount").onclick = (e) => {
+      e.preventDefault();
+      panelTitle.textContent = "Account Details";
+      panelBody.innerHTML = "<p>এখানে name/phone update করা যাবে (Firestore + updateProfile)।</p>";
+    };
+  </script>
+</body>
+</html>
