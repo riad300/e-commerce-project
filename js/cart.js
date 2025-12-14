@@ -6,12 +6,20 @@ import {
   collection, addDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-// ✅ BDT formatter (no extra file needed)
+// ===================== BDT Formatter =====================
 function formatBDT(amount) {
-  return "৳" + Number(amount || 0).toLocaleString("en-BD");
+  const n = Number(amount || 0);
+  return "৳" + n.toLocaleString("en-BD"); // example: ৳10,500
 }
 
-// ✅ তোমার প্রোজেক্টে আসল key = "cart"
+// ✅ যদি তোমার data.json এর দাম USD থাকে, তাহলে এখানে rate বসাও
+// ✅ যদি তুমি data.json এ BDT দামই রাখো, তাহলে RATE = 1 রাখো
+const USD_TO_BDT = 110; // চাইলে change করো
+function priceBDT(usdAmount) {
+  return Math.round(Number(usdAmount || 0) * USD_TO_BDT);
+}
+
+// ===================== LocalStorage Key =====================
 const CART_KEY = "cart";
 
 // -------------------- Local helpers --------------------
@@ -32,12 +40,13 @@ async function readCloudCart(uid) {
   const snap = await getDoc(ref);
   return snap.exists() ? (snap.data().items || []) : [];
 }
+
 async function writeCloudCart(uid, items) {
   const ref = doc(db, "carts", uid);
   await setDoc(ref, { items: items || [], updatedAt: Date.now() }, { merge: true });
 }
 
-// merge by id
+// -------------------- merge by id --------------------
 function mergeCarts(localItems, cloudItems) {
   const map = new Map();
 
@@ -55,11 +64,27 @@ function mergeCarts(localItems, cloudItems) {
   return Array.from(map.values());
 }
 
-// -------------------- State --------------------
+// ===================== State =====================
 let currentUser = null;
 let cart = readLocalCart();
 
-// ✅ UI render
+// ✅ per item price always use this (BDT)
+function getItemUnitPriceBDT(item) {
+  // তোমার item.price.newPrice ইউএসডি হলে BDT তে convert হবে
+  // item.price.newPrice যদি BDT থাকে, USD_TO_BDT = 1 করে দাও
+  return priceBDT(item?.price?.newPrice || 0);
+}
+
+// ✅ calculate cart total in BDT
+function calcItemsTotalBDT(items) {
+  let total = 0;
+  (items || []).forEach((it) => {
+    total += getItemUnitPriceBDT(it) * Number(it.quantity || 1);
+  });
+  return Math.round(total);
+}
+
+// ===================== UI render =====================
 function renderCartUI() {
   displayCartProduct();
   cartProductRoute();
@@ -69,46 +94,56 @@ function renderCartUI() {
   if (cartItem) cartItem.innerHTML = cart.length;
 }
 
-// ✅ Persist = login থাকলে Firestore, না থাকলে localStorage
+// ===================== Persist cart =====================
 async function persistCart() {
+  // local always keep updated (UI compatibility)
+  writeLocalCart(cart);
+
+  // if logged in -> cloud also
   if (currentUser) {
     await writeCloudCart(currentUser.uid, cart);
-  } else {
-    writeLocalCart(cart);
   }
+
   renderCartUI();
 }
 
-// -------------------- AUTH: login হলে cloud cart load + merge --------------------
+// ===================== AUTH sync =====================
 onAuthStateChanged(auth, async (user) => {
   currentUser = user || null;
 
   if (!user) {
-    // guest
     cart = readLocalCart();
     renderCartUI();
     return;
   }
 
-  // logged-in: merge local + cloud
   const local = readLocalCart();
   const cloud = await readCloudCart(user.uid);
+
   cart = mergeCarts(local, cloud);
 
-  // save to cloud + local for UI compatibility
+  // save merged
   await writeCloudCart(user.uid, cart);
   writeLocalCart(cart);
 
   renderCartUI();
 });
 
-// -------------------- CART UI --------------------
+// ===================== CART UI =====================
 function displayCartProduct() {
-  let results = "";
   const cartProduct = document.getElementById("cart-product");
   if (!cartProduct) return;
 
+  if (!cart || cart.length === 0) {
+    cartProduct.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:20px;">Cart is empty</td></tr>`;
+    return;
+  }
+
+  let results = "";
   cart.forEach((item) => {
+    const unitBDT = getItemUnitPriceBDT(item);
+    const subBDT = unitBDT * Number(item.quantity || 1);
+
     results += `
       <tr class="cart-item">
         <td></td>
@@ -117,9 +152,9 @@ function displayCartProduct() {
           <i class="bi bi-x delete-cart" data-id="${item.id}"></i>
         </td>
         <td>${item.name}</td>
-        <td>${formatBDT(item.price.newPrice)}</td>
+        <td>${formatBDT(unitBDT)}</td>
         <td>${item.quantity}</td>
-        <td>${formatBDT(item.price.newPrice * item.quantity)}</td>
+        <td>${formatBDT(subBDT)}</td>
       </tr>
     `;
   });
@@ -141,57 +176,47 @@ function cartProductRoute() {
 
 function removeCartItem() {
   const btnDeleteCart = document.querySelectorAll(".delete-cart");
-  const cartItem = document.querySelector(".header-cart-count");
 
   btnDeleteCart.forEach((button) => {
     button.addEventListener("click", async (e) => {
       const id = Number(e.target.dataset.id);
       cart = cart.filter((item) => item.id !== id);
-
       await persistCart();
-
-      if (cartItem) cartItem.innerHTML = cart.length;
     });
   });
 }
 
+// ===================== Totals =====================
 function saveCardValues() {
   const cartTotal = document.getElementById("cart-total");
   const subTotal = document.getElementById("subtotal");
   const fastCargo = document.getElementById("fast-cargo");
 
-  // ✅ Shipping price BDT (আগে $15 ছিল)
-  const fastCargoPrice = 150; // তোমার ইচ্ছামতো রাখো (BDT)
-
   if (!cartTotal || !subTotal || !fastCargo) return;
 
-  let itemsTotal = 0;
-  cart.length > 0 && cart.map((item) => (itemsTotal += item.price.newPrice * item.quantity));
+  const itemsTotalBDT = calcItemsTotalBDT(cart);
 
-  subTotal.innerHTML = formatBDT(itemsTotal);
-  cartTotal.innerHTML = formatBDT(itemsTotal);
+  // ✅ Shipping BDT
+  const fastCargoPriceBDT = 150; // change if you want
+
+  subTotal.innerHTML = formatBDT(itemsTotalBDT);
+  cartTotal.innerHTML = formatBDT(itemsTotalBDT);
 
   fastCargo.onchange = (e) => {
-    if (e.target.checked) cartTotal.innerHTML = formatBDT(itemsTotal + fastCargoPrice);
-    else cartTotal.innerHTML = formatBDT(itemsTotal);
+    if (e.target.checked) cartTotal.innerHTML = formatBDT(itemsTotalBDT + fastCargoPriceBDT);
+    else cartTotal.innerHTML = formatBDT(itemsTotalBDT);
   };
 }
 
-// -------------------- ✅ CHECKOUT → CREATE ORDER --------------------
-function calcTotal(items) {
-  let total = 0;
-  (items || []).forEach((it) => {
-    total += (it.price?.newPrice || 0) * (it.quantity || 1);
-  });
-  return Math.round(total); // ✅ BDT integer
-}
-
+// ===================== CHECKOUT → CREATE ORDER =====================
 const checkoutBtn = document.getElementById("checkoutBtn");
+
 if (checkoutBtn) {
+  // ✅ Important: stop form submit reload
+  checkoutBtn.type = "button";
+
   checkoutBtn.addEventListener("click", async (e) => {
     e.preventDefault();
-
-    // ✅ prevents form submit reload (very important)
     e.stopPropagation();
 
     // 1) must login
@@ -201,38 +226,40 @@ if (checkoutBtn) {
       return;
     }
 
-    // 2) cart empty?
+    // 2) cart empty
     if (!cart || cart.length === 0) {
       alert("Your cart is empty!");
       return;
     }
 
-    // 3) create order under UID
-    const total = calcTotal(cart);
+    // 3) total in BDT
+    const totalBDT = calcItemsTotalBDT(cart);
 
     try {
-      // ✅ disable button to avoid double click duplicate order
       checkoutBtn.disabled = true;
 
+      // ✅ save order in Firestore
       await addDoc(collection(db, "users", currentUser.uid, "orders"), {
-        items: cart,
-        total,
+        items: cart.map((it) => ({
+          ...it,
+          // ✅ order এ BDT unit price save
+          priceBDT: getItemUnitPriceBDT(it)
+        })),
+        totalBDT,
         currency: "BDT",
         status: "pending",
         createdAt: serverTimestamp()
       });
 
-      // 4) clear cart (both local + cloud)
+      // 4) clear cart local + cloud
       cart = [];
       writeLocalCart(cart);
       await writeCloudCart(currentUser.uid, cart);
 
       alert("Order placed ✅");
-
-      // UI refresh
       renderCartUI();
 
-      // ✅ optional: go to profile/orders page
+      // ✅ optional redirect
       // window.location.href = "profile.html";
 
     } catch (err) {
@@ -244,5 +271,5 @@ if (checkoutBtn) {
   });
 }
 
-// প্রথম load এ render (guest)
+// প্রথম load render
 renderCartUI();
