@@ -34,13 +34,13 @@ window.addEventListener("DOMContentLoaded", () => {
     btnModalClose.addEventListener("click", () => modal.classList.remove("show"));
   }
 
-  if (modal) {
-    document.addEventListener("click", (e) => {
-      if (!e.composedPath().includes(modalContent)) modal.classList.remove("show");
-    });
+  //if (modal) {
+  //  document.addEventListener("click", (e) => {
+    //  if (!e.composedPath().includes(modalContent)) modal.classList.remove("show");
+    //});
 
-    setTimeout(() => modal.classList.add("show"), 3000);
-  }
+    //setTimeout(() => modal.classList.add("show"), 3000);
+  //}
 
   // ✅ Profile icon link update (NO REDIRECT)
   const accountLink = document.getElementById("accountLink");
