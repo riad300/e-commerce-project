@@ -158,38 +158,36 @@
         <input type="text" placeholder="Search a product" />
         <button><i class="bi bi-search"></i></button>
       </div>
-      </form>
       <div class="search-result">
         <div class="search-heading">
           <h3>RESULT FROM PRODUCT</h3>
         </div>
-        <div class="results">
-
-        </div>
+        <div class="results"></div>
       </div>
       <i class="bi bi-x-circle" id="close-modal-search"></i>
     </div>
   </div>
   <!-- ! modal search end -->
 
-
   <!-- ! account start -->
   <section class="account-page">
     <div class="container">
       <div class="account-wrapper">
+
+        <!-- ===== Login ===== -->
         <div class="account-column">
           <h2>Login</h2>
-          <form>
+          <form id="loginForm">
             <div>
               <label>
                 <span>Username or email address <span class="required">*</span></span>
-                <input type="text">
+                <input id="loginEmail" type="text" placeholder="Email address">
               </label>
             </div>
             <div>
               <label>
                 <span>Password <span class="required">*</span></span>
-                <input type="password">
+                <input id="loginPassword" type="password" placeholder="Password">
               </label>
             </div>
             <p class="remember">
@@ -197,30 +195,35 @@
                 <input type="checkbox">
                 <span>Remember Me</span>
               </label>
-              <button class="btn btn-sm">Login</button>
+              <button class="btn btn-sm" id="loginBtn" type="submit">Login</button>
             </p>
             <a href="#" class="form-link">Lost your password?</a>
+
+            <!-- optional message -->
+            <p id="loginMsg" style="margin-top:10px;"></p>
           </form>
         </div>
+
+        <!-- ===== Register ===== -->
         <div class="account-column">
           <h2>Register</h2>
-          <form>
+          <form id="registerForm">
             <div>
               <label>
                 <span>Username <span class="required">*</span></span>
-                <input type="text">
+                <input id="regUsername" type="text" placeholder="Username">
               </label>
             </div>
             <div>
               <label>
                 <span>Email Address <span class="required">*</span></span>
-                <input type="email">
+                <input id="regEmail" type="email" placeholder="Email address">
               </label>
             </div>
             <div>
               <label>
                 <span>Password <span class="required">*</span></span>
-                <input type="password">
+                <input id="regPassword" type="password" placeholder="Password">
               </label>
             </div>
             <div class="privacy-policy-text remember">
@@ -228,10 +231,14 @@
                 Your personal data will be used to support your experience throughout this website, to manage access to
                 your account, and for other purposes described in our <a href="#">privacy policy</a>.
               </p>
-              <button class="btn btn-sm">Register</button>
+              <button class="btn btn-sm" id="registerBtn" type="submit">Register</button>
             </div>
+
+            <!-- optional message -->
+            <p id="regMsg" style="margin-top:10px;"></p>
           </form>
         </div>
+
       </div>
     </div>
   </section>
@@ -349,81 +356,41 @@
           <div class="widget-nav-menu">
             <h4>Information</h4>
             <ul class="menu-list">
-              <li>
-                <a href="#">About Us</a>
-              </li>
-              <li>
-                <a href="#">Privacy Policy</a>
-              </li>
-              <li>
-                <a href="#">Returns Policy</a>
-              </li>
-              <li>
-                <a href="#">Shipping Policy</a>
-              </li>
-              <li>
-                <a href="#">Dropshipping</a>
-              </li>
+              <li><a href="#">About Us</a></li>
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Returns Policy</a></li>
+              <li><a href="#">Shipping Policy</a></li>
+              <li><a href="#">Dropshipping</a></li>
             </ul>
           </div>
           <div class="widget-nav-menu">
             <h4>Account</h4>
             <ul class="menu-list">
-              <li>
-                <a href="#">Dashboard</a>
-              </li>
-              <li>
-                <a href="#">My Orders</a>
-              </li>
-              <li>
-                <a href="#">My Wishlist</a>
-              </li>
-              <li>
-                <a href="#">Account details</a>
-              </li>
-              <li>
-                <a href="#">Track My Orders</a>
-              </li>
+              <li><a href="#">Dashboard</a></li>
+              <li><a href="#">My Orders</a></li>
+              <li><a href="#">My Wishlist</a></li>
+              <li><a href="#">Account details</a></li>
+              <li><a href="#">Track My Orders</a></li>
             </ul>
           </div>
           <div class="widget-nav-menu">
             <h4>Shop</h4>
             <ul class="menu-list">
-              <li>
-                <a href="#">Affiliate</a>
-              </li>
-              <li>
-                <a href="#">Bestsellers</a>
-              </li>
-              <li>
-                <a href="#">Discount</a>
-              </li>
-              <li>
-                <a href="#">Latest Products</a>
-              </li>
-              <li>
-                <a href="#">Sale Products</a>
-              </li>
+              <li><a href="#">Affiliate</a></li>
+              <li><a href="#">Bestsellers</a></li>
+              <li><a href="#">Discount</a></li>
+              <li><a href="#">Latest Products</a></li>
+              <li><a href="#">Sale Products</a></li>
             </ul>
           </div>
           <div class="widget-nav-menu">
             <h4>Categories</h4>
             <ul class="menu-list">
-              <li>
-                <a href="#">Women</a>
-              </li>
-              <li>
-                <a href="#">Men</a>
-              </li>
-              <li>
-                <a href="#">Bags</a>
-              </li>
-              <li>
-                <a href="#">Outerwear</a>
-              </li>
-              <li>
-                <a href="#">Shoes</a>
-              </li>
+              <li><a href="#">Women</a></li>
+              <li><a href="#">Men</a></li>
+              <li><a href="#">Bags</a></li>
+              <li><a href="#">Outerwear</a></li>
+              <li><a href="#">Shoes</a></li>
             </ul>
           </div>
         </div>
@@ -444,15 +411,9 @@
             </a>
             <div class="footer-menu">
               <ul class="footer-menu-list">
-                <li class="list-item">
-                  <a href="#">Privacy Policy</a>
-                </li>
-                <li class="list-item">
-                  <a href="#">Terms and Conditions</a>
-                </li>
-                <li class="list-item">
-                  <a href="#">Returns Policy</a>
-                </li>
+                <li class="list-item"><a href="#">Privacy Policy</a></li>
+                <li class="list-item"><a href="#">Terms and Conditions</a></li>
+                <li class="list-item"><a href="#">Returns Policy</a></li>
               </ul>
             </div>
           </div>
@@ -464,6 +425,88 @@
 
   <!-- scripts start -->
   <script src="js/main.js" type="module"></script>
+
+  <!-- ✅ Firebase Auth (NO BACKEND) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      onAuthStateChanged,
+      updateProfile
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+    // ✅ এখানে তোমার Firebase console থেকে কপি করা config বসাও
+    const firebaseConfig = {
+      apiKey: "AIzaSyAf2Km1a07ZOLfyvUX8xOWmDkE6Rm7lN90",
+      authDomain: "ecommerce-auth-359dd.firebaseapp.com",
+      projectId: "ecommerce-auth-359dd",
+      appId: "1:345618204792:web:7d693af8b5aff11232458d"
+      // storageBucket, messagingSenderId লাগলে এখানে add করতে পারো
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const loginForm = document.getElementById("loginForm");
+    const registerForm = document.getElementById("registerForm");
+
+    const loginMsg = document.getElementById("loginMsg");
+    const regMsg = document.getElementById("regMsg");
+
+    // ===== LOGIN =====
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      loginMsg.textContent = "";
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        alert("Login successful!");
+        window.location.href = "index.html";
+      } catch (err) {
+        loginMsg.textContent = err.message;
+      }
+    });
+
+    // ===== REGISTER =====
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const username = document.getElementById("regUsername").value.trim();
+      const email = document.getElementById("regEmail").value.trim();
+      const password = document.getElementById("regPassword").value;
+
+      regMsg.textContent = "";
+
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+
+        // optional: displayName set (username)
+        if (username) {
+          await updateProfile(cred.user, { displayName: username });
+        }
+
+        alert("Account created! Now login.");
+        registerForm.reset();
+      } catch (err) {
+        regMsg.textContent = err.message;
+      }
+    });
+
+    // ===== AUTH STATE (optional) =====
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log("Logged in:", user.email);
+      } else {
+        console.log("Not logged in");
+      }
+    });
+  </script>
   <!-- scripts end -->
 </body>
 
