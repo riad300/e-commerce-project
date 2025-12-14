@@ -6,6 +6,11 @@ import {
   collection, addDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
+// ✅ BDT formatter (no extra file needed)
+function formatBDT(amount) {
+  return "৳" + Number(amount || 0).toLocaleString("en-BD");
+}
+
 // ✅ তোমার প্রোজেক্টে আসল key = "cart"
 const CART_KEY = "cart";
 
@@ -112,9 +117,9 @@ function displayCartProduct() {
           <i class="bi bi-x delete-cart" data-id="${item.id}"></i>
         </td>
         <td>${item.name}</td>
-        <td>$${item.price.newPrice.toFixed(2)}</td>
+        <td>${formatBDT(item.price.newPrice)}</td>
         <td>${item.quantity}</td>
-        <td>$${(item.price.newPrice * item.quantity).toFixed(2)}</td>
+        <td>${formatBDT(item.price.newPrice * item.quantity)}</td>
       </tr>
     `;
   });
@@ -154,35 +159,40 @@ function saveCardValues() {
   const cartTotal = document.getElementById("cart-total");
   const subTotal = document.getElementById("subtotal");
   const fastCargo = document.getElementById("fast-cargo");
-  const fastCargoPrice = 15;
+
+  // ✅ Shipping price BDT (আগে $15 ছিল)
+  const fastCargoPrice = 150; // তোমার ইচ্ছামতো রাখো (BDT)
 
   if (!cartTotal || !subTotal || !fastCargo) return;
 
   let itemsTotal = 0;
   cart.length > 0 && cart.map((item) => (itemsTotal += item.price.newPrice * item.quantity));
 
-  subTotal.innerHTML = `$${itemsTotal.toFixed(2)}`;
-  cartTotal.innerHTML = `$${itemsTotal.toFixed(2)}`;
+  subTotal.innerHTML = formatBDT(itemsTotal);
+  cartTotal.innerHTML = formatBDT(itemsTotal);
 
   fastCargo.onchange = (e) => {
-    if (e.target.checked) cartTotal.innerHTML = `$${(itemsTotal + fastCargoPrice).toFixed(2)}`;
-    else cartTotal.innerHTML = `$${itemsTotal.toFixed(2)}`;
+    if (e.target.checked) cartTotal.innerHTML = formatBDT(itemsTotal + fastCargoPrice);
+    else cartTotal.innerHTML = formatBDT(itemsTotal);
   };
 }
 
-// -------------------- ✅ CHECKOUT → CREATE ORDER (Daraz style) --------------------
+// -------------------- ✅ CHECKOUT → CREATE ORDER --------------------
 function calcTotal(items) {
   let total = 0;
   (items || []).forEach((it) => {
     total += (it.price?.newPrice || 0) * (it.quantity || 1);
   });
-  return Number(total.toFixed(2));
+  return Math.round(total); // ✅ BDT integer
 }
 
 const checkoutBtn = document.getElementById("checkoutBtn");
 if (checkoutBtn) {
   checkoutBtn.addEventListener("click", async (e) => {
     e.preventDefault();
+
+    // ✅ prevents form submit reload (very important)
+    e.stopPropagation();
 
     // 1) must login
     if (!currentUser) {
@@ -201,9 +211,13 @@ if (checkoutBtn) {
     const total = calcTotal(cart);
 
     try {
+      // ✅ disable button to avoid double click duplicate order
+      checkoutBtn.disabled = true;
+
       await addDoc(collection(db, "users", currentUser.uid, "orders"), {
         items: cart,
         total,
+        currency: "BDT",
         status: "pending",
         createdAt: serverTimestamp()
       });
@@ -217,9 +231,15 @@ if (checkoutBtn) {
 
       // UI refresh
       renderCartUI();
+
+      // ✅ optional: go to profile/orders page
+      // window.location.href = "profile.html";
+
     } catch (err) {
       console.error(err);
       alert("Order failed: " + err.message);
+    } finally {
+      checkoutBtn.disabled = false;
     }
   });
 }
