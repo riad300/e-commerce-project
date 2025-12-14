@@ -22,15 +22,19 @@
         </p>
       </div>
     </div>
+
     <div class="header-row">
       <div class="container">
         <div class="header-wrapper">
+
           <div class="header-mobile">
             <i class="bi bi-list" id="btn-menu"></i>
           </div>
+
           <div class="header-left">
             <a href="/" class="logo">LOGO</a>
           </div>
+
           <div class="header-center" id="sidebar">
             <nav class="navigation">
               <ul class="menu-list">
@@ -52,6 +56,7 @@
                     </ul>
                   </div>
                 </li>
+
                 <li class="menu-list-item megamenu-wrapper">
                   <a href="shop.html" class="menu-link">Shop
                     <i class="bi bi-chevron-down"></i>
@@ -73,10 +78,9 @@
                             <li><a href="#">Hover Style 3</a></li>
                           </ul>
                         </div>
+
                         <div class="megamenu-products">
-                          <h3 class="megamenu-product-title">
-                            Filter Layout
-                          </h3>
+                          <h3 class="megamenu-product-title">Filter Layout</h3>
                           <ul class="megamenu-menu-list">
                             <li><a href="#">Sidebar</a></li>
                             <li><a href="#">Filter Side Out</a></li>
@@ -84,6 +88,7 @@
                             <li><a href="#">Filter Drawer</a></li>
                           </ul>
                         </div>
+
                         <div class="megamenu-products">
                           <h3 class="megamenu-product-title">Shop Loader</h3>
                           <ul class="megamenu-menu-list">
@@ -96,21 +101,20 @@
                           </ul>
                         </div>
                       </div>
+
                       <div class="megamenu-single">
                         <a href="#">
                           <img src="img/mega-menu.jpg" alt="" />
                         </a>
-                        <h3 class="megamenu-single-title">
-                          JOIN THE LAYERING GANG
-                        </h3>
-                        <h4 class="megamenu-single-subtitle">
-                          Suspendisse faucibus nunc et pellentesque
-                        </h4>
+                        <h3 class="megamenu-single-title">JOIN THE LAYERING GANG</h3>
+                        <h4 class="megamenu-single-subtitle">Suspendisse faucibus nunc et pellentesque</h4>
                         <a href="#" class="megamenu-single-button btn btn-sm">Shop Now</a>
                       </div>
+
                     </div>
                   </div>
                 </li>
+
                 <li class="menu-list-item">
                   <a href="blog.html" class="menu-link">Blog</a>
                 </li>
@@ -125,7 +129,7 @@
           <div class="header-right">
             <div class="header-right-links">
 
-              <!-- ✅ FIXED: account link with id -->
+              <!-- ✅ IMPORTANT: id added -->
               <a href="account.html" id="accountLink">
                 <i class="bi bi-person"></i>
               </a>
@@ -147,6 +151,7 @@
 
             </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -157,9 +162,7 @@
   <div class="modal-search">
     <div class="modal-wrapper">
       <h3 class="modal-title">Search for products</h3>
-      <p class="modal-text">
-        Start typing to see products you are looking for.
-      </p>
+      <p class="modal-text">Start typing to see products you are looking for.</p>
       <div class="search">
         <input type="text" placeholder="Search a product" />
         <button><i class="bi bi-search"></i></button>
@@ -187,15 +190,17 @@
             <div>
               <label>
                 <span>Username or email address <span class="required">*</span></span>
-                <input id="loginEmail" type="text" placeholder="Email address">
+                <input id="loginEmail" type="text" placeholder="Email address" required>
               </label>
             </div>
+
             <div>
               <label>
                 <span>Password <span class="required">*</span></span>
-                <input id="loginPassword" type="password" placeholder="Password">
+                <input id="loginPassword" type="password" placeholder="Password" required>
               </label>
             </div>
+
             <p class="remember">
               <label>
                 <input type="checkbox">
@@ -203,6 +208,7 @@
               </label>
               <button class="btn btn-sm" id="loginBtn" type="submit">Login</button>
             </p>
+
             <a href="#" class="form-link">Lost your password?</a>
             <p id="loginMsg" style="margin-top:10px;"></p>
           </form>
@@ -215,21 +221,24 @@
             <div>
               <label>
                 <span>Username <span class="required">*</span></span>
-                <input id="regUsername" type="text" placeholder="Username">
+                <input id="regUsername" type="text" placeholder="Username" required>
               </label>
             </div>
+
             <div>
               <label>
                 <span>Email Address <span class="required">*</span></span>
-                <input id="regEmail" type="email" placeholder="Email address">
+                <input id="regEmail" type="email" placeholder="Email address" required>
               </label>
             </div>
+
             <div>
               <label>
                 <span>Password <span class="required">*</span></span>
-                <input id="regPassword" type="password" placeholder="Password">
+                <input id="regPassword" type="password" placeholder="Password" required>
               </label>
             </div>
+
             <div class="privacy-policy-text remember">
               <p>
                 Your personal data will be used to support your experience throughout this website, to manage access to
@@ -237,6 +246,7 @@
               </p>
               <button class="btn btn-sm" id="registerBtn" type="submit">Register</button>
             </div>
+
             <p id="regMsg" style="margin-top:10px;"></p>
           </form>
         </div>
@@ -251,12 +261,11 @@
 
   <!-- ✅ Firebase Auth (NO BACKEND) -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
     import {
       getAuth,
       createUserWithEmailAndPassword,
       signInWithEmailAndPassword,
-      onAuthStateChanged,
       updateProfile
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
@@ -267,22 +276,14 @@
       appId: "1:345618204792:web:7d693af8b5aff11232458d"
     };
 
-    const app = initializeApp(firebaseConfig);
+    // ✅ Safe initialize (avoid duplicate init problems)
+    const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
     const loginForm = document.getElementById("loginForm");
     const registerForm = document.getElementById("registerForm");
     const loginMsg = document.getElementById("loginMsg");
     const regMsg = document.getElementById("regMsg");
-
-    // ✅ account icon link auto update (logged-in -> profile)
-    onAuthStateChanged(auth, (user) => {
-      const accountLink = document.getElementById("accountLink");
-      if (accountLink) {
-        accountLink.href = user ? "profile.html" : "account.html";
-      }
-      console.log(user ? ("Logged in: " + user.email) : "Not logged in");
-    });
 
     // ===== LOGIN =====
     loginForm.addEventListener("submit", async (e) => {
