@@ -12,11 +12,12 @@ function formatBDT(amount) {
   return "৳" + n.toLocaleString("en-BD"); // example: ৳10,500
 }
 
-// ✅ যদি তোমার data.json এর দাম USD থাকে, তাহলে এখানে rate বসাও
-// ✅ যদি তুমি data.json এ BDT দামই রাখো, তাহলে RATE = 1 রাখো
-const USD_TO_BDT = 110; // চাইলে change করো
-function priceBDT(usdAmount) {
-  return Math.round(Number(usdAmount || 0) * USD_TO_BDT);
+// ✅ OPTION A: data.json এ BDT price আছে → RATE = 1
+const USD_TO_BDT = 1;
+
+// (keep function name same so you don't change other code)
+function priceBDT(amount) {
+  return Math.round(Number(amount || 0) * USD_TO_BDT);
 }
 
 // ===================== LocalStorage Key =====================
@@ -40,7 +41,6 @@ async function readCloudCart(uid) {
   const snap = await getDoc(ref);
   return snap.exists() ? (snap.data().items || []) : [];
 }
-
 async function writeCloudCart(uid, items) {
   const ref = doc(db, "carts", uid);
   await setDoc(ref, { items: items || [], updatedAt: Date.now() }, { merge: true });
@@ -70,8 +70,7 @@ let cart = readLocalCart();
 
 // ✅ per item price always use this (BDT)
 function getItemUnitPriceBDT(item) {
-  // তোমার item.price.newPrice ইউএসডি হলে BDT তে convert হবে
-  // item.price.newPrice যদি BDT থাকে, USD_TO_BDT = 1 করে দাও
+  // item.price.newPrice এখন BDT
   return priceBDT(item?.price?.newPrice || 0);
 }
 
@@ -208,66 +207,15 @@ function saveCardValues() {
   };
 }
 
-// ===================== CHECKOUT → CREATE ORDER =====================
+// ===================== CHECKOUT button (Recommended) =====================
+// ✅ Best practice: cart page থেকে checkout.html এ redirect করো
 const checkoutBtn = document.getElementById("checkoutBtn");
 
 if (checkoutBtn) {
-  // ✅ Important: stop form submit reload
   checkoutBtn.type = "button";
-
-  checkoutBtn.addEventListener("click", async (e) => {
+  checkoutBtn.addEventListener("click", (e) => {
     e.preventDefault();
-    e.stopPropagation();
-
-    // 1) must login
-    if (!currentUser) {
-      alert("Please login to place an order.");
-      window.location.href = "account.html";
-      return;
-    }
-
-    // 2) cart empty
-    if (!cart || cart.length === 0) {
-      alert("Your cart is empty!");
-      return;
-    }
-
-    // 3) total in BDT
-    const totalBDT = calcItemsTotalBDT(cart);
-
-    try {
-      checkoutBtn.disabled = true;
-
-      // ✅ save order in Firestore
-      await addDoc(collection(db, "users", currentUser.uid, "orders"), {
-        items: cart.map((it) => ({
-          ...it,
-          // ✅ order এ BDT unit price save
-          priceBDT: getItemUnitPriceBDT(it)
-        })),
-        totalBDT,
-        currency: "BDT",
-        status: "pending",
-        createdAt: serverTimestamp()
-      });
-
-      // 4) clear cart local + cloud
-      cart = [];
-      writeLocalCart(cart);
-      await writeCloudCart(currentUser.uid, cart);
-
-      alert("Order placed ✅");
-      renderCartUI();
-
-      // ✅ optional redirect
-      // window.location.href = "profile.html";
-
-    } catch (err) {
-      console.error(err);
-      alert("Order failed: " + err.message);
-    } finally {
-      checkoutBtn.disabled = false;
-    }
+    window.location.href = "checkout.html";
   });
 }
 
