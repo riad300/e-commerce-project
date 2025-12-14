@@ -1,186 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Account</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" />
   <link rel="stylesheet" href="css/main.css" />
+  <title>E-Commerce | Profile</title>
 </head>
+
 <body>
-
-<section class="account-page">
-  <div class="container">
-    <div class="account-wrapper">
-
-      <!-- Left menu -->
-      <div class="account-column">
-        <h2>My Account</h2>
-        <p style="margin-top:10px;">
-          <strong id="userName">—</strong><br>
-          <span id="userEmail">—</span>
+  <!-- header -->
+  <header>
+    <div class="global-notification">
+      <div class="container">
+        <p>
+          SUMMER SALE FOR ALL SWIM SUITS AND FREE EXPRESS INTERNATIONAL
+          DELIVERY - OFF 50%! <a href="shop.html">SHOP NOW</a>
         </p>
-
-        <ul class="menu-list" style="margin-top:15px;">
-          <li><a href="#" data-tab="dashboard">Dashboard</a></li>
-          <li><a href="#" data-tab="orders">My Orders</a></li>
-          <li><a href="#" data-tab="address">My Address</a></li>
-          <li><a href="#" data-tab="wishlist">Wishlist</a></li>
-          <li><a href="#" data-tab="cart">My Cart</a></li>
-          <li><a href="#" data-tab="account">Account Details</a></li>
-        </ul>
-
-        <button class="btn btn-sm" id="logoutBtn" style="margin-top:15px;">Logout</button>
       </div>
+    </div>
 
-      <!-- Right content -->
-      <div class="account-column">
-        <h2 id="panelTitle">Dashboard</h2>
-        <div id="panelBody">
-          <p>Welcome! এখান থেকে তোমার account manage করতে পারবে.</p>
+    <div class="header-row">
+      <div class="container">
+        <div class="header-wrapper">
+          <div class="header-mobile">
+            <i class="bi bi-list" id="btn-menu"></i>
+          </div>
+          <div class="header-left">
+            <a href="/" class="logo">LOGO</a>
+          </div>
+
+          <div class="header-center" id="sidebar">
+            <nav class="navigation">
+              <ul class="menu-list">
+                <li class="menu-list-item"><a href="/" class="menu-link">Home</a></li>
+                <li class="menu-list-item"><a href="shop.html" class="menu-link">Shop</a></li>
+                <li class="menu-list-item"><a href="blog.html" class="menu-link">Blog</a></li>
+                <li class="menu-list-item"><a href="contact.html" class="menu-link">Contact</a></li>
+              </ul>
+            </nav>
+            <i class="bi-x-circle" id="close-sidebar"></i>
+          </div>
+
+          <div class="header-right">
+            <div class="header-right-links">
+              <a href="account.html" id="accountLink"><i class="bi bi-person"></i></a>
+              <button class="search-button"><i class="bi bi-search"></i></button>
+              <a href="#"><i class="bi bi-heart"></i></a>
+              <div class="header-cart">
+                <a href="cart.html" class="header-cart-link">
+                  <i class="bi bi-bag"></i>
+                  <span class="header-cart-count">0</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
-
     </div>
-  </div>
-</section>
+  </header>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+  <!-- profile content -->
+  <section class="account-page">
+    <div class="container">
+      <div class="account-wrapper">
+        <div class="account-column" style="width:100%;">
+          <h2>My Profile</h2>
 
-  // ✅ একই config (account/cart সব জায়গায় same)
-  const firebaseConfig = {
-    apiKey: "PASTE_HERE",
-    authDomain: "PASTE_HERE",
-    projectId: "PASTE_HERE",
-    appId: "PASTE_HERE"
-  };
+          <p><strong>Name:</strong> <span id="pName">Loading...</span></p>
+          <p><strong>Email:</strong> <span id="pEmail">Loading...</span></p>
+          <p><strong>UID:</strong> <span id="pUid">Loading...</span></p>
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+          <div style="margin-top:20px;">
+            <button class="btn btn-sm" id="logoutBtn">Logout</button>
+          </div>
 
-  const userName = document.getElementById("userName");
-  const userEmail = document.getElementById("userEmail");
-  const panelTitle = document.getElementById("panelTitle");
-  const panelBody = document.getElementById("panelBody");
+          <hr style="margin:25px 0;" />
 
-  let currentUser = null;
+          <h2>My Orders</h2>
+          <div id="ordersBox">Loading orders...</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  // ---------- Protect page ----------
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      window.location.href = "account.html";
-      return;
-    }
-    currentUser = user;
+  <script src="js/main.js" type="module"></script>
 
-    userName.textContent = user.displayName || "Customer";
-    userEmail.textContent = user.email || "";
+  <script type="module">
+    import { auth, db } from "./js/firebase.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import {
+      collection,
+      getDocs,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-    // Ensure profile doc exists
-    const ref = doc(db, "users", user.uid);
-    const snap = await getDoc(ref);
-    if (!snap.exists()) {
-      await setDoc(ref, {
-        name: user.displayName || "",
-        email: user.email || "",
-        phone: "",
-        createdAt: Date.now()
+    const pName = document.getElementById("pName");
+    const pEmail = document.getElementById("pEmail");
+    const pUid = document.getElementById("pUid");
+    const ordersBox = document.getElementById("ordersBox");
+
+    async function loadOrders(uid) {
+      ordersBox.textContent = "Loading orders...";
+      const q = query(collection(db, "users", uid, "orders"), orderBy("createdAt", "desc"));
+      const snap = await getDocs(q);
+
+      if (snap.empty) {
+        ordersBox.innerHTML = "<p>No orders yet.</p>";
+        return;
+      }
+
+      let html = "<ul style='padding-left:18px;'>";
+      snap.forEach((docu) => {
+        const o = docu.data();
+        html += `<li style="margin-bottom:10px;">
+          <strong>Status:</strong> ${o.status || "pending"} |
+          <strong>Total:</strong> $${o.total || 0} |
+          <strong>Items:</strong> ${(o.items || []).length}
+        </li>`;
       });
+      html += "</ul>";
+      ordersBox.innerHTML = html;
     }
 
-    // default tab
-    loadTab("dashboard");
-  });
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "account.html"; // ✅ not logged in
+        return;
+      }
 
-  // ---------- Logout ----------
-  document.getElementById("logoutBtn").addEventListener("click", async () => {
-    await signOut(auth);
-    window.location.href = "account.html";
-  });
+      pName.textContent = user.displayName || "Customer";
+      pEmail.textContent = user.email || "-";
+      pUid.textContent = user.uid;
 
-  // ---------- Tabs ----------
-  document.querySelectorAll("[data-tab]").forEach(a => {
-    a.addEventListener("click", (e) => {
-      e.preventDefault();
-      loadTab(a.dataset.tab);
+      await loadOrders(user.uid);
     });
-  });
 
-  async function loadTab(tab) {
-    if (!currentUser) return;
-
-    if (tab === "dashboard") {
-      panelTitle.textContent = "Dashboard";
-      panelBody.innerHTML = `
-        <p>✅ Logged in as <strong>${currentUser.email}</strong></p>
-        <p>এখানে order summary, cart count, wishlist count দেখাতে পারবে।</p>
-      `;
-    }
-
-    if (tab === "orders") {
-      panelTitle.textContent = "My Orders";
-      panelBody.innerHTML = `<p>এখানে Firestore থেকে orders list show করবো (next step)।</p>`;
-    }
-
-    if (tab === "address") {
-      panelTitle.textContent = "My Address";
-      panelBody.innerHTML = `
-        <p>এখানে shipping address add/edit হবে (Firestore)।</p>
-        <p><small>Next step এ form + save করে দেবো।</small></p>
-      `;
-    }
-
-    if (tab === "wishlist") {
-      panelTitle.textContent = "Wishlist";
-      panelBody.innerHTML = `<p>Wishlist items (Firestore) এখানে দেখাবে।</p>`;
-    }
-
-    if (tab === "cart") {
-      panelTitle.textContent = "My Cart";
-      panelBody.innerHTML = `
-        <p>Cart দেখতে: <a href="cart.html">Open Cart Page</a></p>
-        <p>(Cart Firestore sync তুমি আগেই শুরু করেছো)</p>
-      `;
-    }
-
-    if (tab === "account") {
-      panelTitle.textContent = "Account Details";
-      panelBody.innerHTML = `
-        <form id="profileForm">
-          <div style="margin-bottom:10px;">
-            <label>Name</label>
-            <input id="pName" type="text" style="width:100%;" />
-          </div>
-          <div style="margin-bottom:10px;">
-            <label>Phone</label>
-            <input id="pPhone" type="text" style="width:100%;" />
-          </div>
-          <button class="btn btn-sm" type="submit">Save</button>
-          <p id="saveMsg" style="margin-top:10px;"></p>
-        </form>
-      `;
-
-      // load existing profile
-      const ref = doc(db, "users", currentUser.uid);
-      const snap = await getDoc(ref);
-      const data = snap.data() || {};
-      document.getElementById("pName").value = data.name || currentUser.displayName || "";
-      document.getElementById("pPhone").value = data.phone || "";
-
-      document.getElementById("profileForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        await setDoc(ref, {
-          name: document.getElementById("pName").value.trim(),
-          phone: document.getElementById("pPhone").value.trim(),
-          email: currentUser.email
-        }, { merge: true });
-        document.getElementById("saveMsg").textContent = "Saved ✅";
-      });
-    }
-  }
-</script>
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "account.html";
+    });
+  </script>
 </body>
+
 </html>
