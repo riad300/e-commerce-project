@@ -5,14 +5,12 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- !bootstrap icon -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" />
   <link rel="stylesheet" href="css/main.css" />
   <title>E-Commerce | Account</title>
 </head>
 
 <body>
-  <!-- ! header start -->
   <header>
     <div class="global-notification">
       <div class="container">
@@ -26,11 +24,9 @@
     <div class="header-row">
       <div class="container">
         <div class="header-wrapper">
-
           <div class="header-mobile">
             <i class="bi bi-list" id="btn-menu"></i>
           </div>
-
           <div class="header-left">
             <a href="/" class="logo">LOGO</a>
           </div>
@@ -39,9 +35,7 @@
             <nav class="navigation">
               <ul class="menu-list">
                 <li class="menu-list-item">
-                  <a href="/" class="menu-link">Home
-                    <i class="bi bi-chevron-down"></i>
-                  </a>
+                  <a href="/" class="menu-link">Home <i class="bi bi-chevron-down"></i></a>
                   <div class="menu-dropdown-wrapper">
                     <ul class="menu-dropdown-content">
                       <li><a href="#">Home Clean</a></li>
@@ -58,9 +52,7 @@
                 </li>
 
                 <li class="menu-list-item megamenu-wrapper">
-                  <a href="shop.html" class="menu-link">Shop
-                    <i class="bi bi-chevron-down"></i>
-                  </a>
+                  <a href="shop.html" class="menu-link">Shop <i class="bi bi-chevron-down"></i></a>
                   <div class="menu-dropdown-wrapper">
                     <div class="menu-dropdown-megamenu">
                       <div class="megamenu-links">
@@ -103,24 +95,17 @@
                       </div>
 
                       <div class="megamenu-single">
-                        <a href="#">
-                          <img src="img/mega-menu.jpg" alt="" />
-                        </a>
+                        <a href="#"><img src="img/mega-menu.jpg" alt="" /></a>
                         <h3 class="megamenu-single-title">JOIN THE LAYERING GANG</h3>
                         <h4 class="megamenu-single-subtitle">Suspendisse faucibus nunc et pellentesque</h4>
                         <a href="#" class="megamenu-single-button btn btn-sm">Shop Now</a>
                       </div>
-
                     </div>
                   </div>
                 </li>
 
-                <li class="menu-list-item">
-                  <a href="blog.html" class="menu-link">Blog</a>
-                </li>
-                <li class="menu-list-item">
-                  <a href="contact.html" class="menu-link">Contact</a>
-                </li>
+                <li class="menu-list-item"><a href="blog.html" class="menu-link">Blog</a></li>
+                <li class="menu-list-item"><a href="contact.html" class="menu-link">Contact</a></li>
               </ul>
             </nav>
             <i class="bi-x-circle" id="close-sidebar"></i>
@@ -128,19 +113,14 @@
 
           <div class="header-right">
             <div class="header-right-links">
-
-              <!-- ✅ IMPORTANT: id added -->
+              <!-- ✅ IMPORTANT -->
               <a href="account.html" id="accountLink">
                 <i class="bi bi-person"></i>
               </a>
 
-              <button class="search-button">
-                <i class="bi bi-search"></i>
-              </button>
+              <button class="search-button"><i class="bi bi-search"></i></button>
 
-              <a href="#">
-                <i class="bi bi-heart"></i>
-              </a>
+              <a href="#"><i class="bi bi-heart"></i></a>
 
               <div class="header-cart">
                 <a href="cart.html" class="header-cart-link">
@@ -148,7 +128,6 @@
                   <span class="header-cart-count">0</span>
                 </a>
               </div>
-
             </div>
           </div>
 
@@ -156,9 +135,7 @@
       </div>
     </div>
   </header>
-  <!-- ! header end -->
 
-  <!-- ! modal search start -->
   <div class="modal-search">
     <div class="modal-wrapper">
       <h3 class="modal-title">Search for products</h3>
@@ -168,22 +145,17 @@
         <button><i class="bi bi-search"></i></button>
       </div>
       <div class="search-result">
-        <div class="search-heading">
-          <h3>RESULT FROM PRODUCT</h3>
-        </div>
+        <div class="search-heading"><h3>RESULT FROM PRODUCT</h3></div>
         <div class="results"></div>
       </div>
       <i class="bi bi-x-circle" id="close-modal-search"></i>
     </div>
   </div>
-  <!-- ! modal search end -->
 
-  <!-- ! account start -->
   <section class="account-page">
     <div class="container">
       <div class="account-wrapper">
 
-        <!-- ===== Login ===== -->
         <div class="account-column">
           <h2>Login</h2>
           <form id="loginForm">
@@ -193,14 +165,12 @@
                 <input id="loginEmail" type="text" placeholder="Email address" required>
               </label>
             </div>
-
             <div>
               <label>
                 <span>Password <span class="required">*</span></span>
                 <input id="loginPassword" type="password" placeholder="Password" required>
               </label>
             </div>
-
             <p class="remember">
               <label>
                 <input type="checkbox">
@@ -208,13 +178,11 @@
               </label>
               <button class="btn btn-sm" id="loginBtn" type="submit">Login</button>
             </p>
-
             <a href="#" class="form-link">Lost your password?</a>
             <p id="loginMsg" style="margin-top:10px;"></p>
           </form>
         </div>
 
-        <!-- ===== Register ===== -->
         <div class="account-column">
           <h2>Register</h2>
           <form id="registerForm">
@@ -224,21 +192,18 @@
                 <input id="regUsername" type="text" placeholder="Username" required>
               </label>
             </div>
-
             <div>
               <label>
                 <span>Email Address <span class="required">*</span></span>
                 <input id="regEmail" type="email" placeholder="Email address" required>
               </label>
             </div>
-
             <div>
               <label>
                 <span>Password <span class="required">*</span></span>
                 <input id="regPassword" type="password" placeholder="Password" required>
               </label>
             </div>
-
             <div class="privacy-policy-text remember">
               <p>
                 Your personal data will be used to support your experience throughout this website, to manage access to
@@ -246,7 +211,6 @@
               </p>
               <button class="btn btn-sm" id="registerBtn" type="submit">Register</button>
             </div>
-
             <p id="regMsg" style="margin-top:10px;"></p>
           </form>
         </div>
@@ -254,72 +218,49 @@
       </div>
     </div>
   </section>
-  <!-- ! account end -->
 
   <!-- scripts start -->
   <script src="js/main.js" type="module"></script>
 
-  <!-- ✅ Firebase Auth (NO BACKEND) -->
+  <!-- ✅ Only Login/Register here (NO onAuthState redirect) -->
   <script type="module">
-    import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { auth } from "./js/firebase.js";
     import {
-      getAuth,
       createUserWithEmailAndPassword,
       signInWithEmailAndPassword,
       updateProfile
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAf2Km1a07ZOLfyvUX8xOWmDkE6Rm7lN90",
-      authDomain: "ecommerce-auth-359dd.firebaseapp.com",
-      projectId: "ecommerce-auth-359dd",
-      appId: "1:345618204792:web:7d693af8b5aff11232458d"
-    };
-
-    // ✅ Safe initialize (avoid duplicate init problems)
-    const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
-    const auth = getAuth(app);
 
     const loginForm = document.getElementById("loginForm");
     const registerForm = document.getElementById("registerForm");
     const loginMsg = document.getElementById("loginMsg");
     const regMsg = document.getElementById("regMsg");
 
-    // ===== LOGIN =====
     loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-
       const email = document.getElementById("loginEmail").value.trim();
       const password = document.getElementById("loginPassword").value;
-
       loginMsg.textContent = "";
 
       try {
         await signInWithEmailAndPassword(auth, email, password);
         alert("Login successful!");
-        window.location.href = "index.html"; // ✅ Daraz style: go to home
+        window.location.href = "index.html";
       } catch (err) {
         loginMsg.textContent = err.message;
       }
     });
 
-    // ===== REGISTER =====
     registerForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-
       const username = document.getElementById("regUsername").value.trim();
       const email = document.getElementById("regEmail").value.trim();
       const password = document.getElementById("regPassword").value;
-
       regMsg.textContent = "";
 
       try {
         const cred = await createUserWithEmailAndPassword(auth, email, password);
-
-        if (username) {
-          await updateProfile(cred.user, { displayName: username });
-        }
-
+        if (username) await updateProfile(cred.user, { displayName: username });
         alert("Account created! Now login.");
         registerForm.reset();
       } catch (err) {
