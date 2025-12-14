@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <link rel="stylesheet" href="css/main.css" />
   <title>Checkout</title>
+
   <style>
     .checkout-wrap{max-width:900px;margin:40px auto;padding:0 16px}
     .row{display:grid;grid-template-columns:1fr 1fr;gap:24px}
@@ -16,6 +17,7 @@
     @media(max-width:820px){.row{grid-template-columns:1fr}}
   </style>
 </head>
+
 <body>
 
   <div class="checkout-wrap">
@@ -25,10 +27,26 @@
       <!-- Shipping -->
       <div class="card">
         <h3>Shipping Details</h3>
-        <div class="field"><label>Name</label><input id="name" type="text" placeholder="Full name"></div>
-        <div class="field"><label>Phone</label><input id="phone" type="text" placeholder="01XXXXXXXXX"></div>
-        <div class="field"><label>Address</label><textarea id="address" rows="3" placeholder="Full delivery address"></textarea></div>
-        <div class="field"><label>City</label><input id="city" type="text" placeholder="Dhaka"></div>
+
+        <div class="field">
+          <label>Name</label>
+          <input id="name" type="text" placeholder="Full name">
+        </div>
+
+        <div class="field">
+          <label>Phone</label>
+          <input id="phone" type="text" placeholder="01XXXXXXXXX">
+        </div>
+
+        <div class="field">
+          <label>Address</label>
+          <textarea id="address" rows="3" placeholder="Full delivery address"></textarea>
+        </div>
+
+        <div class="field">
+          <label>City</label>
+          <input id="city" type="text" placeholder="Dhaka">
+        </div>
 
         <div class="field">
           <label>Payment Method</label>
@@ -38,7 +56,7 @@
           </select>
         </div>
 
-        <small id="hint" style="display:block;margin-top:8px;color:#555;">
+        <small style="display:block;margin-top:8px;color:#555;">
           COD select করলে অর্ডার confirm হবে। Online Payment select করলে payment link এ নিয়ে যাবে।
         </small>
       </div>
@@ -47,46 +65,67 @@
       <div class="card">
         <h3>Order Summary</h3>
         <div id="itemsBox">Loading...</div>
+
         <hr style="margin:14px 0;">
+
         <div class="total">Total: <span id="totalBox">$0.00</span></div>
 
         <div style="margin-top:16px;">
-          <button class="btn btn-lg btn-red" id="placeOrderBtn">Place Order</button>
+          <!-- ✅ type="button" (submit হবে না) -->
+          <button type="button" class="btn btn-lg btn-red" id="placeOrderBtn">Place Order</button>
           <p id="msg" style="margin-top:10px;"></p>
         </div>
       </div>
     </div>
   </div>
 
-  <script type="module">
-    import { auth, db } from "./js/firebase.js";
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-    import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
+  <script type="module">
+    // ✅ Firebase SDK (NO external firebase.js dependency)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    // ✅ তোমার firebase config (account.html এ যেটা দিছো)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAf2Km1a07ZOLfyvUX8xOWmDkE6Rm7lN90",
+      authDomain: "ecommerce-auth-359dd.firebaseapp.com",
+      projectId: "ecommerce-auth-359dd",
+      appId: "1:345618204792:web:7d693af8b5aff11232458d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // ---------- UI refs ----------
     const itemsBox = document.getElementById("itemsBox");
     const totalBox = document.getElementById("totalBox");
     const msg = document.getElementById("msg");
-
     const placeOrderBtn = document.getElementById("placeOrderBtn");
     const paymentMethod = document.getElementById("paymentMethod");
 
-    // তোমার cart key = "cart"
+    // ---------- Cart helpers ----------
     function readCart() {
       try { return JSON.parse(localStorage.getItem("cart")) || []; }
       catch { return []; }
     }
+
     function calcTotal(cart) {
-      return cart.reduce((sum, it) => sum + (it.price?.newPrice || 0) * (it.quantity || 1), 0);
+      return cart.reduce((sum, it) => sum + (Number(it.price?.newPrice || 0) * Number(it.quantity || 1)), 0);
     }
+
     function render(cart) {
       if (!cart.length) {
         itemsBox.innerHTML = "<p>Your cart is empty.</p>";
         totalBox.textContent = "$0.00";
         return;
       }
+
       let html = "<ul style='padding-left:18px;'>";
       cart.forEach(it => {
-        html += `<li>${it.name} × ${it.quantity} — $${(it.price.newPrice * it.quantity).toFixed(2)}</li>`;
+        const line = Number(it.price.newPrice) * Number(it.quantity || 1);
+        html += `<li>${it.name} × ${it.quantity} — $${line.toFixed(2)}</li>`;
       });
       html += "</ul>";
       itemsBox.innerHTML = html;
@@ -95,11 +134,12 @@
       totalBox.textContent = "$" + total.toFixed(2);
     }
 
-    let currentUser = null;
+    // first render
     let cart = readCart();
     render(cart);
 
-    // ✅ Profile system: login না থাকলে account page
+    // ✅ must login
+    let currentUser = null;
     onAuthStateChanged(auth, (user) => {
       currentUser = user;
       if (!user) {
@@ -107,52 +147,84 @@
       }
     });
 
-    // ✅ Online payment link (এখানে তোমার link বসাবে)
-    const PAYMENT_LINK_URL = "https://buy.stripe.com/REPLACE_WITH_YOUR_LINK"; 
-    // অথবা SSLCOMMERZ/bKash hosted checkout link
+    // ✅ Replace with your Stripe/Payment link (if you use online payment)
+    const PAYMENT_LINK_URL = "https://buy.stripe.com/REPLACE_WITH_YOUR_LINK";
 
+    // ---------- Place Order ----------
     placeOrderBtn.addEventListener("click", async () => {
-      msg.textContent = "";
-      cart = readCart();
-      if (!cart.length) { msg.textContent = "Cart empty."; return; }
+      try {
+        msg.textContent = "";
+        msg.style.color = "black";
 
-      const name = document.getElementById("name").value.trim();
-      const phone = document.getElementById("phone").value.trim();
-      const address = document.getElementById("address").value.trim();
-      const city = document.getElementById("city").value.trim();
+        if (!currentUser) {
+          msg.textContent = "Please login first.";
+          window.location.href = "account.html";
+          return;
+        }
 
-      if (!name || !phone || !address) {
-        msg.textContent = "Name, phone, address required.";
-        return;
+        cart = readCart();
+        if (!cart.length) {
+          msg.textContent = "Cart empty.";
+          return;
+        }
+
+        const name = document.getElementById("name").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const address = document.getElementById("address").value.trim();
+        const city = document.getElementById("city").value.trim();
+
+        if (!name || !phone || !address) {
+          msg.textContent = "Name, phone, address required.";
+          msg.style.color = "red";
+          return;
+        }
+
+        placeOrderBtn.disabled = true;
+        placeOrderBtn.textContent = "Placing...";
+
+        const total = calcTotal(cart);
+        const orderId = "ORD-" + Date.now();
+
+        // ✅ Save order to Firestore
+        await setDoc(doc(db, "users", currentUser.uid, "orders", orderId), {
+          orderId,
+          uid: currentUser.uid,
+          email: currentUser.email || "",
+          items: cart,
+          total,
+          currency: "USD",
+          status: paymentMethod.value === "cod" ? "placed" : "pending_payment",
+          shipping: { name, phone, address, city },
+          createdAt: Date.now()
+        });
+
+        // ✅ COD
+        if (paymentMethod.value === "cod") {
+          localStorage.setItem("cart", JSON.stringify([])); // clear cart
+          msg.textContent = "✅ Order placed (COD). Redirecting...";
+          msg.style.color = "green";
+
+          setTimeout(() => {
+            window.location.href = "profile.html";
+          }, 900);
+          return;
+        }
+
+        // ✅ Online payment (redirect)
+        msg.textContent = "Redirecting to payment...";
+        msg.style.color = "green";
+        window.location.href = PAYMENT_LINK_URL;
+
+      } catch (err) {
+        console.error(err);
+        msg.textContent = "❌ " + (err?.message || "Something went wrong");
+        msg.style.color = "red";
+      } finally {
+        placeOrderBtn.disabled = false;
+        placeOrderBtn.textContent = "Place Order";
       }
-      if (!currentUser) return;
-
-      const total = calcTotal(cart);
-      const orderId = "ORD-" + Date.now();
-
-      // ✅ 1) Order save to Firestore (no backend)
-      await setDoc(doc(db, "users", currentUser.uid, "orders", orderId), {
-        orderId,
-        items: cart,
-        total,
-        currency: "USD",
-        status: paymentMethod.value === "cod" ? "placed" : "pending_payment",
-        shipping: { name, phone, address, city },
-        createdAt: Date.now()
-      });
-
-      // ✅ 2) Payment method logic
-      if (paymentMethod.value === "cod") {
-        localStorage.setItem("cart", JSON.stringify([])); // clear cart
-        msg.textContent = "✅ Order placed (COD). Redirecting to profile...";
-        setTimeout(() => window.location.href = "profile.html", 900);
-        return;
-      }
-
-      // Online link redirect
-      msg.textContent = "Redirecting to payment...";
-      window.location.href = PAYMENT_LINK_URL;
     });
   </script>
+
 </body>
 </html>
