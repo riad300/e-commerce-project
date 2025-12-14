@@ -172,8 +172,6 @@
     </div>
     <!-- ! modal search end -->
 
- 
-
     <!-- ! cart start -->
     <section class="cart-page">
         <div class="container">
@@ -204,14 +202,15 @@
                         <div class="action-wrapper">
                             <div class="coupon">
                                 <input type="text" class="input-text" placeholder="Coupon Code">
-                                <button class="btn btn-black btn-md">Apply Coupon</button>
+                                <button class="btn btn-black btn-md" type="button">Apply Coupon</button>
                             </div>
                             <div class="update-coupon">
-                                <button class="btn btn-red btn-md">Update Cart</button>
+                                <button class="btn btn-red btn-md" type="button">Update Cart</button>
                             </div>
                         </div>
                     </div>
                 </form>
+
                 <div class="cart-collaterals">
                     <div class="cart-totals">
                         <h2>Cart Totals</h2>
@@ -250,10 +249,14 @@
                             </tbody>
                         </table>
                         <div class="checkout">
-                            <button class="btn btn-lg btn-red" id="checkoutBtn">Proceed to checkout</button>
+                            <!-- ✅ FIXED: prevent form submit -->
+                            <button type="button" class="btn btn-lg btn-red" id="checkoutBtn">
+                                Proceed to checkout
+                            </button>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </section>
@@ -315,7 +318,7 @@
                             <div class="footer-subscribe-bottom">
                                 <form>
                                     <input type="text" placeholder="enter your email addres" />
-                                    <button class="btn">Subscribe</button>
+                                    <button class="btn" type="button">Subscribe</button>
                                 </form>
                                 <p class="privacy-text">
                                     By subscribing you agree to our
@@ -489,6 +492,16 @@
     <!-- scripts start -->
     <script src="js/main.js" type="module"></script>
     <script type="module" src="js/cart.js"></script>
+
+    <!-- ✅ NEW: Checkout button handler -->
+    <script>
+        const checkoutBtn = document.getElementById("checkoutBtn");
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener("click", () => {
+                window.location.href = "checkout.html";
+            });
+        }
+    </script>
     <!-- scripts end -->
 
 </body>
