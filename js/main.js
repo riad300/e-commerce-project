@@ -64,3 +64,20 @@ if (modal) {
 
 
 //! modal dialog end
+import { auth } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+const accountLink = document.getElementById("accountLink");
+
+onAuthStateChanged(auth, (user) => {
+  if (!accountLink) return;
+
+  if (user) {
+    // logged in → profile page
+    accountLink.href = "profile.html";
+  } else {
+    // not logged in → account page
+    accountLink.href = "account.html";
+  }
+});
+
