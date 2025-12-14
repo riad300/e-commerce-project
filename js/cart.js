@@ -1,7 +1,10 @@
 // js/cart.js (MODULE)
 import { auth, db } from "./firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import {
+  doc, getDoc, setDoc,
+  collection, addDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 // ✅ তোমার প্রোজেক্টে আসল key = "cart"
 const CART_KEY = "cart";
@@ -18,7 +21,7 @@ function writeLocalCart(items) {
   localStorage.setItem(CART_KEY, JSON.stringify(items || []));
 }
 
-// -------------------- Firestore helpers --------------------
+// -------------------- Firestore cart helpers --------------------
 async function readCloudCart(uid) {
   const ref = doc(db, "carts", uid);
   const snap = await getDoc(ref);
@@ -34,7 +37,7 @@ function mergeCarts(localItems, cloudItems) {
   const map = new Map();
 
   const put = (it) => {
-    const key = it.id ?? it.productId ?? it.name; // তোমার item এ id আছে, তাই id best
+    const key = it.id ?? it.productId ?? it.name;
     if (!key) return;
 
     const prev = map.get(key);
@@ -51,7 +54,7 @@ function mergeCarts(localItems, cloudItems) {
 let currentUser = null;
 let cart = readLocalCart();
 
-// ✅ UI render = তোমার existing function গুলো
+// ✅ UI render
 function renderCartUI() {
   displayCartProduct();
   cartProductRoute();
@@ -87,14 +90,14 @@ onAuthStateChanged(auth, async (user) => {
   const cloud = await readCloudCart(user.uid);
   cart = mergeCarts(local, cloud);
 
-  // save to cloud + also write local for current UI compatibility
+  // save to cloud + local for UI compatibility
   await writeCloudCart(user.uid, cart);
   writeLocalCart(cart);
 
   renderCartUI();
 });
 
-// -------------------- তোমার পুরোনো cart UI code (slightly edited) --------------------
+// -------------------- CART UI --------------------
 function displayCartProduct() {
   let results = "";
   const cartProduct = document.getElementById("cart-product");
@@ -138,10 +141,8 @@ function removeCartItem() {
   btnDeleteCart.forEach((button) => {
     button.addEventListener("click", async (e) => {
       const id = Number(e.target.dataset.id);
-
       cart = cart.filter((item) => item.id !== id);
 
-      // ✅ local+cloud sync
       await persistCart();
 
       if (cartItem) cartItem.innerHTML = cart.length;
@@ -167,6 +168,60 @@ function saveCardValues() {
     if (e.target.checked) cartTotal.innerHTML = `$${(itemsTotal + fastCargoPrice).toFixed(2)}`;
     else cartTotal.innerHTML = `$${itemsTotal.toFixed(2)}`;
   };
+}
+
+// -------------------- ✅ CHECKOUT → CREATE ORDER (Daraz style) --------------------
+function calcTotal(items) {
+  let total = 0;
+  (items || []).forEach((it) => {
+    total += (it.price?.newPrice || 0) * (it.quantity || 1);
+  });
+  return Number(total.toFixed(2));
+}
+
+const checkoutBtn = document.getElementById("checkoutBtn");
+if (checkoutBtn) {
+  checkoutBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+
+    // 1) must login
+    if (!currentUser) {
+      alert("Please login to place an order.");
+      window.location.href = "account.html";
+      return;
+    }
+
+    // 2) cart empty?
+    if (!cart || cart.length === 0) {
+      alert("Your cart is empty!");
+      return;
+    }
+
+    // 3) create order under UID
+    const total = calcTotal(cart);
+
+    try {
+      await addDoc(collection(db, "users", currentUser.uid, "orders"), {
+        items: cart,
+        total,
+        status: "pending",
+        createdAt: serverTimestamp()
+      });
+
+      // 4) clear cart (both local + cloud)
+      cart = [];
+      writeLocalCart(cart);
+      await writeCloudCart(currentUser.uid, cart);
+
+      alert("Order placed ✅");
+
+      // UI refresh
+      renderCartUI();
+    } catch (err) {
+      console.error(err);
+      alert("Order failed: " + err.message);
+    }
+  });
 }
 
 // প্রথম load এ render (guest)
